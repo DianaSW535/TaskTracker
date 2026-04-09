@@ -84,11 +84,6 @@
       word-break: break-word;
     }
 
-    .task-item.done .task-text {
-      text-decoration: line-through;
-      color: #6b7280;
-    }
-
     .delete-btn {
       border: none;
       border-radius: 6px;
@@ -150,102 +145,72 @@
   </main>
 
   <script>
-    const input = document.getElementById("task-input");
-    const addButton = document.getElementById("add-task-btn");
-    const taskList = document.getElementById("task-list");
+    let tasks = [{ text: "Task 1" }, { text: "Task 2" }, { text: "Task 3" }];
+
     const completedHistory = document.getElementById("completed-history");
 
+    function escapeHtml(text) {
+        const el = document.createElement("div");
+        el.textContent = text;
+        return el.innerHTML;
+    }
+
     function addTaskToHistory(taskText) {
-      const placeholder = completedHistory.querySelector('option[value=""]');
-      if (placeholder) {
-        placeholder.remove();
-      }
-
-      const option = document.createElement("option");
-      option.value = taskText;
-      option.textContent = taskText;
-      completedHistory.appendChild(option);
-    }
-
-    function resetHistoryPlaceholderIfNeeded() {
-      if (completedHistory.options.length === 0) {
-        const emptyOption = document.createElement("option");
-        emptyOption.value = "";
-        emptyOption.textContent = "Пока нет выполненных задач";
-        completedHistory.appendChild(emptyOption);
-      }
-    }
-
-    function clearListIfAllCompleted() {
-      const items = Array.from(taskList.querySelectorAll(".task-item"));
-      if (items.length === 0) {
-        return;
-      }
-
-      const areAllDone = items.every((item) => item.classList.contains("done"));
-      if (!areAllDone) {
-        return;
-      }
-
-      items.forEach((item) => {
-        const taskText = item.querySelector(".task-text")?.textContent?.trim();
-        if (taskText) {
-          addTaskToHistory(taskText);
+        const placeholder = completedHistory.querySelector('option[value=""]');
+        if (placeholder) {
+            placeholder.remove();
         }
-      });
-
-      taskList.innerHTML = "";
-      resetHistoryPlaceholderIfNeeded();
+        const option = document.createElement("option");
+        option.value = taskText;
+        option.textContent = taskText;
+        completedHistory.appendChild(option);
     }
 
-    function createTaskElement(taskText) {
-      const listItem = document.createElement("li");
-      listItem.className = "task-item";
+    function renderTasks() {
+        const list = document.getElementById("task-list");
+        list.innerHTML = tasks
+            .map(
+                (task, i) =>
+                    `<li class="task-item" data-index="${i}">` +
+                    `<input type="checkbox" aria-label="Отметить задачу как выполненную" onchange="completeTask(${i})" />` +
+                    `<span class="task-text">${escapeHtml(task.text)}</span>` +
+                    `<button type="button" class="delete-btn" onclick="deleteTask(${i})">Удалить</button></li>`
+            )
+            .join("");
+    }
 
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.setAttribute("aria-label", "Отметить задачу как выполненную");
-
-      const text = document.createElement("span");
-      text.className = "task-text";
-      text.textContent = taskText;
-
-      const deleteButton = document.createElement("button");
-      deleteButton.type = "button";
-      deleteButton.className = "delete-btn";
-      deleteButton.textContent = "Удалить";
-
-      checkbox.addEventListener("change", () => {
-        listItem.classList.toggle("done", checkbox.checked);
-        clearListIfAllCompleted();
-      });
-
-      deleteButton.addEventListener("click", () => {
-        listItem.remove();
-      });
-
-      listItem.append(checkbox, text, deleteButton);
-      return listItem;
+    function completeTask(index) {
+        const task = tasks[index];
+        if (!task) {
+            return;
+        }
+        addTaskToHistory(task.text);
+        tasks.splice(index, 1);
+        renderTasks();
     }
 
     function addTask() {
-      const rawValue = input.value.trim();
-      if (!rawValue) {
-        return;
-      }
-
-      const taskElement = createTaskElement(rawValue);
-      taskList.appendChild(taskElement);
-      input.value = "";
-      input.focus();
+        const input = document.getElementById("task-input");
+        if(input.value.trim() !== "") {
+            tasks.push({ text: input.value.trim() });
+            input.value = "";
+            renderTasks();
+        }
     }
 
-    addButton.addEventListener("click", addTask);
-    input.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        addTask();
-      }
+    function deleteTask(index) {
+        tasks.splice(index, 1);
+        renderTasks();
+    }
+
+    document.getElementById("add-task-btn").addEventListener("click", addTask);
+    document.getElementById("task-input").addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            addTask();
+        }
     });
-  </script>
+
+    renderTasks();
+</script>
 </body>
 </html>
