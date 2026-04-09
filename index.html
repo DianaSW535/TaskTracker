@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Трекер задач</title>
+  <title>Трекер задач и привычек</title>
   <style>
     :root {
       color-scheme: light dark;
@@ -30,6 +30,13 @@
     h1 {
       margin: 0 0 16px;
       font-size: 24px;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #374151;
     }
 
     .controls {
@@ -130,11 +137,186 @@
       font-size: 14px;
       background: #ffffff;
     }
+
+    .habits-section {
+      margin-top: 20px;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 16px;
+    }
+
+    .habit-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    #habit-input {
+      flex: 1;
+      min-width: 140px;
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    #habit-time {
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #ffffff;
+    }
+
+    #add-habit-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #059669;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #add-habit-btn:hover {
+      background: #047857;
+    }
+
+    #habit-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .habit-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid #d1fae5;
+      border-radius: 8px;
+      background: #ecfdf5;
+    }
+
+    .habit-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .habit-title {
+      font-weight: 600;
+      word-break: break-word;
+    }
+
+    .habit-time-label {
+      font-size: 12px;
+      color: #047857;
+      margin-top: 2px;
+    }
+
+    .notify-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    #enable-notify-btn {
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      background: #ffffff;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    #enable-notify-btn:hover {
+      background: #f9fafb;
+    }
+
+    .notify-status {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .notify-status.ok {
+      color: #047857;
+    }
+
+    .notify-status.warn {
+      color: #b45309;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #111827;
+        color: #f9fafb;
+      }
+
+      .app {
+        background: #1f2937;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      h2 {
+        color: #e5e7eb;
+      }
+
+      #task-input,
+      #habit-input,
+      #habit-time,
+      #completed-history {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+      }
+
+      .task-item {
+        background: #374151;
+        border-color: #4b5563;
+      }
+
+      .habit-item {
+        background: #064e3b;
+        border-color: #047857;
+      }
+
+      .habit-time-label {
+        color: #6ee7b7;
+      }
+
+      .history label {
+        color: #d1d5db;
+      }
+
+      .history {
+        border-top-color: #4b5563;
+      }
+
+      .habits-section {
+        border-top-color: #4b5563;
+      }
+
+      #enable-notify-btn {
+        background: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+      }
+
+      #enable-notify-btn:hover {
+        background: #4b5563;
+      }
+    }
   </style>
 </head>
 <body>
   <main class="app">
-    <h1>Трекер задач</h1>
+    <h1>Трекер задач и привычек</h1>
     <div class="controls">
       <input id="task-input" type="text" placeholder="Введите новую задачу" />
       <button id="add-task-btn" type="button">Добавить</button>
@@ -147,6 +329,21 @@
         <option value="">Пока нет выполненных задач</option>
       </select>
     </div>
+
+    <section class="habits-section" aria-labelledby="habits-heading">
+      <h2 id="habits-heading">Привычки и напоминания</h2>
+      <div class="notify-row">
+        <button id="enable-notify-btn" type="button">Включить напоминания</button>
+        <span id="notify-status" class="notify-status" role="status"></span>
+      </div>
+      <div class="habit-controls">
+        <input id="habit-input" type="text" placeholder="Название привычки" />
+        <input id="habit-time" type="time" value="09:00" aria-label="Время напоминания" />
+        <button id="add-habit-btn" type="button">Добавить привычку</button>
+      </div>
+      <ul id="habit-list"></ul>
+      <p class="hint">Напоминания приходят в браузере в выбранное время (не чаще одного раза в день на привычку). Данные сохраняются в этом браузере.</p>
+    </section>
   </main>
 
   <script>
@@ -154,6 +351,217 @@
     const addButton = document.getElementById("add-task-btn");
     const taskList = document.getElementById("task-list");
     const completedHistory = document.getElementById("completed-history");
+
+    const habitInput = document.getElementById("habit-input");
+    const habitTimeInput = document.getElementById("habit-time");
+    const addHabitBtn = document.getElementById("add-habit-btn");
+    const habitList = document.getElementById("habit-list");
+    const enableNotifyBtn = document.getElementById("enable-notify-btn");
+    const notifyStatus = document.getElementById("notify-status");
+
+    const STORAGE_HABITS = "taskTrackerHabits";
+    const STORAGE_REMINDER_LOG = "taskTrackerHabitReminderLog";
+
+    function loadHabits() {
+      try {
+        const raw = localStorage.getItem(STORAGE_HABITS);
+        if (!raw) {
+          return [];
+        }
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveHabits(habits) {
+      localStorage.setItem(STORAGE_HABITS, JSON.stringify(habits));
+    }
+
+    function loadReminderLog() {
+      try {
+        const raw = localStorage.getItem(STORAGE_REMINDER_LOG);
+        if (!raw) {
+          return {};
+        }
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" ? parsed : {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveReminderLog(log) {
+      localStorage.setItem(STORAGE_REMINDER_LOG, JSON.stringify(log));
+    }
+
+    function todayKey() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    function formatTimeRu(hhmm) {
+      if (!hhmm || typeof hhmm !== "string") {
+        return "";
+      }
+      const [h, m] = hhmm.split(":");
+      return `${h}:${m || "00"}`;
+    }
+
+    function updateNotifyStatus() {
+      if (!("Notification" in window)) {
+        notifyStatus.textContent = "Уведомления в этом браузере недоступны.";
+        notifyStatus.className = "notify-status warn";
+        enableNotifyBtn.disabled = true;
+        return;
+      }
+      if (Notification.permission === "granted") {
+        notifyStatus.textContent = "Напоминания включены.";
+        notifyStatus.className = "notify-status ok";
+        enableNotifyBtn.hidden = true;
+      } else if (Notification.permission === "denied") {
+        notifyStatus.textContent = "Доступ к уведомлениям запрещён — разрешите их в настройках сайта.";
+        notifyStatus.className = "notify-status warn";
+        enableNotifyBtn.hidden = true;
+      } else {
+        notifyStatus.textContent = "Нажмите кнопку, чтобы разрешить уведомления.";
+        notifyStatus.className = "notify-status";
+        enableNotifyBtn.hidden = false;
+      }
+    }
+
+    function showHabitReminder(title) {
+      if (!("Notification" in window) || Notification.permission !== "granted") {
+        return;
+      }
+      try {
+        new Notification("Привычка: напоминание", {
+          body: title,
+          tag: `habit-${title}`,
+          renotify: true,
+        });
+      } catch {
+        /* ignore */
+      }
+    }
+
+    function checkDueHabits() {
+      const habits = loadHabits();
+      if (habits.length === 0) {
+        return;
+      }
+      if (!("Notification" in window) || Notification.permission !== "granted") {
+        return;
+      }
+
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, "0");
+      const min = String(now.getMinutes()).padStart(2, "0");
+      const currentHm = `${h}:${min}`;
+      const dateKey = todayKey();
+      const log = loadReminderLog();
+      let changed = false;
+
+      for (const habit of habits) {
+        if (!habit.id || !habit.title || !habit.time) {
+          continue;
+        }
+        if (habit.time !== currentHm) {
+          continue;
+        }
+        if (log[habit.id] === dateKey) {
+          continue;
+        }
+        showHabitReminder(habit.title);
+        log[habit.id] = dateKey;
+        changed = true;
+      }
+
+      if (changed) {
+        saveReminderLog(log);
+      }
+    }
+
+    function removeHabit(id) {
+      const habits = loadHabits().filter((h) => h.id !== id);
+      saveHabits(habits);
+      const log = loadReminderLog();
+      delete log[id];
+      saveReminderLog(log);
+      renderHabits();
+    }
+
+    function renderHabits() {
+      habitList.innerHTML = "";
+      const habits = loadHabits();
+      for (const habit of habits) {
+        const li = document.createElement("li");
+        li.className = "habit-item";
+
+        const info = document.createElement("div");
+        info.className = "habit-info";
+        const titleEl = document.createElement("div");
+        titleEl.className = "habit-title";
+        titleEl.textContent = habit.title;
+        const timeEl = document.createElement("div");
+        timeEl.className = "habit-time-label";
+        timeEl.textContent = `Напоминание: ${formatTimeRu(habit.time)}`;
+        info.append(titleEl, timeEl);
+
+        const del = document.createElement("button");
+        del.type = "button";
+        del.className = "delete-btn";
+        del.textContent = "Удалить";
+        del.addEventListener("click", () => removeHabit(habit.id));
+
+        li.append(info, del);
+        habitList.appendChild(li);
+      }
+    }
+
+    function addHabit() {
+      const title = habitInput.value.trim();
+      if (!title) {
+        return;
+      }
+      const time = habitTimeInput.value;
+      if (!time) {
+        return;
+      }
+      const habits = loadHabits();
+      habits.push({
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        title,
+        time,
+      });
+      saveHabits(habits);
+      habitInput.value = "";
+      habitInput.focus();
+      renderHabits();
+    }
+
+    enableNotifyBtn.addEventListener("click", async () => {
+      if (!("Notification" in window)) {
+        return;
+      }
+      try {
+        await Notification.requestPermission();
+      } catch {
+        /* ignore */
+      }
+      updateNotifyStatus();
+    });
+
+    addHabitBtn.addEventListener("click", addHabit);
+    habitInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        addHabit();
+      }
+    });
 
     function addTaskToHistory(taskText) {
       const placeholder = completedHistory.querySelector('option[value=""]');
@@ -244,6 +652,16 @@
     input.addEventListener("keydown", (event) => {
       if (event.key === "Enter") {
         addTask();
+      }
+    });
+
+    updateNotifyStatus();
+    renderHabits();
+    checkDueHabits();
+    setInterval(checkDueHabits, 30_000);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") {
+        checkDueHabits();
       }
     });
   </script>
